@@ -467,7 +467,7 @@
             formData.append('00NPo00000HnqbZ', attributionLabel(results.attribution)); // Attribution_Source__c
             
             // Send to Salesforce
-            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
+            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&debug=1&debugEmail=frank@thenewtradeprogram.com', {
               method: 'POST',
               body: formData,
               mode: 'no-cors'
