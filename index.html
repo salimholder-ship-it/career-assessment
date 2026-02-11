@@ -485,27 +485,53 @@
             formData.append('00NPo00000HneaQ', leadScore); // Lead_Score__c
             formData.append('00NPo00000HnqbZ', attributionLabel(results.attribution)); // Attribution_Source__c
             
-            // Send to Salesforce
-            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
-              method: 'POST',
-              body: formData,
-              mode: 'no-cors'
-            }).then(() => {
-              console.log('Lead sent to Salesforce successfully');
-            }).catch((error) => {
-              console.error('Error sending to Salesforce:', error);
-            });
+            // Send to Salesforce using traditional form submission via hidden iframe
+            // This avoids CORS issues and doesn't navigate away from the page
+            
+            // Create hidden iframe for submission
+            const iframe = document.createElement('iframe');
+            iframe.name = 'salesforce_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            // Create form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
+            form.target = 'salesforce_iframe'; // Submit to iframe
+            form.style.display = 'none';
+            
+            // Add all FormData entries to the form
+            for (let [key, value] of formData.entries()) {
+              const input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = key;
+              input.value = value;
+              form.appendChild(input);
+            }
+            
+            // Append form to document and submit
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Clean up after submission
+            setTimeout(() => {
+              if (form.parentNode) document.body.removeChild(form);
+              if (iframe.parentNode) document.body.removeChild(iframe);
+            }, 3000);
+            
+            console.log('✅ Lead submitted to Salesforce via hidden iframe form POST');
           };
           
           // Helper functions to convert codes to readable labels
           const employmentStatusLabel = (status) => {
             const map = {
-              'employed': 'Employed full-time, looking to switch careers',
-              'unemployed': 'Currently unemployed, seeking new opportunities',
+              'employed': 'Employed Full-time',
+              'unemployed': 'Unemployed',
               'student': 'Student',
-              'parent': 'Currently unemployed, seeking new opportunities' // Map to closest match since "Stay-at-home Parent" not in Salesforce picklist
+              'parent': 'Stay-at-home Parent'
             };
-            return map[status] || 'Student';
+            return map[status] || 'Unknown';
           };
           
           const experienceLevelLabel = (level) => {
@@ -520,24 +546,24 @@
           
           const motivationLabel = (motivation) => {
             const map = {
-              'unemployment': 'Career Change',
-              'stagnation': 'Career Change',
-              'money': 'Higher Income', // FIXED: Was "Increase Income"
-              'passion': 'Passion/Interest', // FIXED: Was "Passion for Field"
-              'insecurity': 'Job Security',
-              'exploration': 'Flexibility' // Map to closest match
+              'unemployment': 'Unemployed',
+              'stagnation': 'Dead-end Job',
+              'money': 'Increase Income',
+              'passion': 'Passion for Field',
+              'insecurity': 'Job Instability',
+              'exploration': 'Exploring Options'
             };
-            return map[motivation] || 'Career Change';
+            return map[motivation] || 'Unknown';
           };
           
           const timelineLabel = (urgency) => {
             const map = {
-              'hot': 'Within 1-2 months', // Assessment says "1-3 months", this is closest match
-              'warm': 'Within 3-6 months',
-              'cool': 'Just exploring (6+ months)', // Assessment says "6-12 months", this is closest match
-              'cold': 'Just exploring (6+ months)'
+              'hot': 'ASAP (1-3 months)',
+              'warm': 'Soon (3-6 months)',
+              'cool': 'This Year (6-12 months)',
+              'cold': 'Just Researching'
             };
-            return map[urgency] || 'Just exploring (6+ months)';
+            return map[urgency] || 'Unknown';
           };
           
           const objectionLabel = (objection) => {
@@ -555,13 +581,13 @@
           
           const attributionLabel = (source) => {
             const map = {
-              'organic': 'organic (Google/Search)',
-              'social': 'social (Social Media)',
-              'referral': 'referral (Friend/Family)',
-              'paid': 'paid (Online Ad)',
-              'video': 'video (YouTube)' // FIXED: Was just "YouTube"
+              'organic': 'Google/Search',
+              'social': 'Social Media',
+              'referral': 'Referral',
+              'paid': 'Online Ad',
+              'video': 'YouTube'
             };
-            return map[source] || 'other';
+            return map[source] || 'Other';
           };
 
           const progress = ((currentQuestion + 1) / questions.length) * 100;
