@@ -408,7 +408,7 @@
           // Salesforce Web-to-Lead Integration
           const sendToSalesforce = (results) => {
             // ⚠️ IMPORTANT: Replace with YOUR Salesforce Organization ID
-            const SALESFORCE_OID = 'YOUR_SALESFORCE_ORG_ID_HERE'; // Get this from Web-to-Lead setup
+            const SALESFORCE_OID = '00DHs000003XeAG'; // Your actual Salesforce OID
             
             // Calculate lead score
             const urgencyScore = {
@@ -443,17 +443,28 @@
             formData.append('company', 'Self');
             formData.append('lead_source', 'Career Assessment');
             
-            // Custom fields (use your actual API names from Salesforce)
-            formData.append('00N5e00000XXXXX', results.secondary?.name || 'Not assigned'); // Program_Interest__c
-            formData.append('00N5e00000XXXXX', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
-            formData.append('00N5e00000XXXXX', experienceLevelLabel(results.experience)); // Experience_Level__c
-            formData.append('00N5e00000XXXXX', motivationLabel(results.motivation)); // Motivation__c
-            formData.append('00N5e00000XXXXX', timelineLabel(results.urgency)); // Timeline__c
-            formData.append('00N5e00000XXXXX', objectionLabel(results.objection)); // Primary_Objection__c
-            formData.append('00N5e00000XXXXX', results.targetSalary[0]); // Target_Salary__c
-            formData.append('00N5e00000XXXXX', results.urgency); // Urgency_Score__c
-            formData.append('00N5e00000XXXXX', leadScore); // Lead_Score__c
-            formData.append('00N5e00000XXXXX', attributionLabel(results.attribution)); // Attribution_Source__c
+            // Custom fields - YOUR ACTUAL SALESFORCE FIELD IDs
+            formData.append('00NPo00000Hni9N', results.primary.name); // Recommended_Program__c (AI Fundamentals)
+            formData.append('00NPo00000HniVx', results.secondary?.name || 'Not assigned'); // Secondary_Program__c
+            
+            // Work Interests (comma-separated list)
+            const interestsList = Object.entries(results.interests || {})
+              .filter(([key, value]) => value > 0)
+              .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
+              .join(', ');
+            formData.append('00NPo00000Hnrfh', interestsList); // Work_Interests__c
+            
+            // Note: Work_Environment__c field exists in Salesforce but not collected in this assessment
+            // formData.append('00NPo00000HnjIL', 'Flexible - I\'m open to different setups'); // Default value
+            
+            formData.append('00NPo00000HnjlN', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
+            formData.append('00NPo00000HnkHd', experienceLevelLabel(results.experience)); // Experience_Level__c
+            formData.append('00NPo00000Hnksj', motivationLabel(results.motivation)); // Primary_Motivation__c
+            formData.append('00NPo00000HnlSD', timelineLabel(results.urgency)); // Timeline__c
+            formData.append('00NPo00000Hnltd', objectionLabel(results.objection)); // Primary_Objection__c
+            formData.append('00NPo00000HnnH8', `$${results.targetSalary[0].toLocaleString()} - $${results.targetSalary[1].toLocaleString()}`); // Target_Salary__c
+            formData.append('00NPo00000HneaQ', leadScore); // Lead_Score__c
+            formData.append('00NPo00000HnqbZ', attributionLabel(results.attribution)); // Attribution_Source__c
             
             // Send to Salesforce
             fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
