@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The New Trade Program - Career Path Finder</title>
+    
+    <!-- React & ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone for JSX compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS with custom colors -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tntp-navy': '#243861',
+                        'tntp-sky': '#64ABDE',
+                        'tntp-gold': '#F9B418',
+                        'tntp-cream': '#F5E8D4',
+                    },
+                    fontFamily: {
+                        'heading': ['Para Supreme', 'Georgia', 'serif'],
+                        'body': ['Gotham', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Gotham', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        .font-heading {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Lucide React Icons as inline SVG components
+        const Sparkles = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+        );
+        
+        const ArrowRight = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+        );
+
+        const Mail = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+        );
+
+        const CheckCircle = ({ className }) => (
+            <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+        );
+
+        const Clock = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        );
+
+        const Target = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12a3 3 0 106 0 3 3 0 00-6 0z" />
+            </svg>
+        );
+
+        const MapPin = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        );
+
+        const TrendingUp = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+        );
+
+        const Award = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="8" r="7" />
+                <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
+            </svg>
+        );
+
+        const Zap = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        );
+
+        const Download = ({ className }) => (
+            <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+        );
+
+        const TNTPAssessment = () => {
+          const [showWelcome, setShowWelcome] = useState(true);
+          const [currentQuestion, setCurrentQuestion] = useState(0);
+          const [answers, setAnswers] = useState({});
+          const [showResults, setShowResults] = useState(false);
+          const [email, setEmail] = useState('');
+          const [name, setName] = useState('');
+          const [emailCaptured, setEmailCaptured] = useState(false);
+
+          // Question data structure
+          const questions = [
+            {
+              id: 1,
+              section: "Career Interest",
+              question: "Which work activities sound most interesting to you?",
+              subtitle: "Select all that apply",
+              type: "multi-select",
+              options: [
+                { id: "content", label: "Creating content and managing social media", icon: "📱", tracks: ["social", "marketing"] },
+                { id: "data", label: "Analyzing data and measuring campaign performance", icon: "📊", tracks: ["ads", "marketing"] },
+                { id: "security", label: "Protecting systems and solving security challenges", icon: "🔒", tracks: ["cyber"] },
+                { id: "writing", label: "Writing compelling marketing messages", icon: "✍️", tracks: ["marketing", "social"] },
+                { id: "roi", label: "Managing advertising budgets and ROI", icon: "💰", tracks: ["ads", "marketing"] },
+                { id: "design", label: "Designing visual content and brands", icon: "🎨", tracks: ["social", "marketing"] },
+                { id: "ai", label: "Using AI tools to work smarter", icon: "🤖", tracks: ["marketing", "cyber", "ads", "social"] }
+              ]
+            },
+            {
+              id: 2,
+              section: "Career Interest",
+              question: "What type of work environment excites you most?",
+              type: "single-select",
+              options: [
+                { id: "trends", label: "Fast-paced, constantly changing trends", track: "social" },
+                { id: "strategic", label: "Strategic, data-driven decision making", track: "marketing" },
+                { id: "technical", label: "Problem-solving, technical challenges", track: "cyber" },
+                { id: "creative", label: "Creative campaigns with measurable results", track: "ads" },
+                { id: "unsure", label: "I'm not sure yet - show me all options", track: "explore" }
+              ]
+            },
+            {
+              id: 3,
+              section: "Background",
+              question: "What's your current employment status?",
+              type: "single-select",
+              options: [
+                { id: "full-time", label: "Employed full-time", segment: "employed" },
+                { id: "part-time", label: "Employed part-time", segment: "employed" },
+                { id: "unemployed", label: "Unemployed/Between jobs", segment: "unemployed" },
+                { id: "student", label: "Student", segment: "student" },
+                { id: "parent", label: "Stay-at-home parent looking to return to work", segment: "parent" }
+              ]
+            },
+            {
+              id: 4,
+              section: "Experience Level",
+              question: "What's your current tech experience?",
+              type: "single-select",
+              options: [
+                { id: "new", label: "\"How do I turn this on?\" - I'm completely new", score: 0 },
+                { id: "beginner", label: "I can navigate apps and learn new software", score: 1 },
+                { id: "intermediate", label: "I've built websites or worked with code before", score: 2 },
+                { id: "advanced", label: "I've built apps or have 10+ years experience", score: 3 }
+              ]
+            },
+            {
+              id: 5,
+              section: "Motivation",
+              question: "What's driving you to explore career training right now?",
+              subtitle: "Select your primary reason",
+              type: "single-select",
+              options: [
+                { id: "unemployed", label: "I'm unemployed and need a new career path", urgency: "high", pain: "unemployment" },
+                { id: "stuck", label: "I'm stuck in a dead-end job with no growth", urgency: "medium", pain: "stagnation" },
+                { id: "income", label: "I want to increase my income significantly", urgency: "medium", pain: "money" },
+                { id: "passion", label: "I'm passionate about tech/marketing and want to break in", urgency: "medium", pain: "passion" },
+                { id: "unstable", label: "My current job is unstable or being automated", urgency: "high", pain: "insecurity" },
+                { id: "exploring", label: "Just exploring options for the future", urgency: "low", pain: "exploration" }
+              ]
+            },
+            {
+              id: 6,
+              section: "Motivation",
+              question: "When are you hoping to start your new career?",
+              type: "single-select",
+              options: [
+                { id: "asap", label: "As soon as possible (within 1-3 months)", urgency: "hot" },
+                { id: "soon", label: "In the next 3-6 months", urgency: "warm" },
+                { id: "year", label: "Within 6-12 months", urgency: "cool" },
+                { id: "researching", label: "Just researching for now", urgency: "cold" }
+              ]
+            },
+            {
+              id: 7,
+              section: "Motivation",
+              question: "What's your biggest concern about enrolling in a training program?",
+              subtitle: "Select your top concern",
+              type: "single-select",
+              options: [
+                { id: "cost", label: "Cost/Affordability", objection: "price" },
+                { id: "time", label: "Time commitment with my schedule", objection: "time" },
+                { id: "confidence", label: "Not sure if I can succeed/learn the material", objection: "confidence" },
+                { id: "jobs", label: "Worried about job opportunities after graduation", objection: "placement" },
+                { id: "choice", label: "Not sure which program is right for me", objection: "confusion" },
+                { id: "family", label: "Need to discuss with family/partner first", objection: "decision-maker" },
+                { id: "none", label: "No Concerns...Let's Gooooo!", objection: "none" }
+              ]
+            },
+            {
+              id: 8,
+              section: "Goals & Logistics",
+              question: "What salary are you targeting in the next 12-18 months?",
+              type: "single-select",
+              options: [
+                { id: "35-54", label: "$35,000 - $54,000", range: [35000, 54000] },
+                { id: "55-74", label: "$55,000 - $74,000", range: [55000, 74000] },
+                { id: "75-94", label: "$75,000 - $94,000", range: [75000, 94000] },
+                { id: "95+", label: "$95,000+", range: [95000, 120000] }
+              ]
+            },
+            {
+              id: 9,
+              section: "Contact Information",
+              question: "What's the best phone number to reach you?",
+              subtitle: "Optional - for program updates and support",
+              type: "text",
+              placeholder: "(555) 123-4567",
+              validation: (val) => !val || val.length >= 10
+            },
+            {
+              id: 10,
+              section: "Just Curious",
+              question: "How did you hear about The New Trade Program?",
+              type: "single-select",
+              options: [
+                { id: "google", label: "Google/Search engine", source: "organic" },
+                { id: "social", label: "Social media (Facebook, Instagram, TikTok)", source: "social" },
+                { id: "referral", label: "Friend or family referral", source: "referral" },
+                { id: "ad", label: "Online ad", source: "paid" },
+                { id: "youtube", label: "YouTube", source: "video" },
+                { id: "other", label: "Other", source: "other" }
+              ]
+            }
+          ];
+
+          const handleAnswer = (questionId, value) => {
+            setAnswers(prev => ({
+              ...prev,
+              [questionId]: value
+            }));
+          };
+
+          const handleNext = () => {
+            if (currentQuestion < questions.length - 1) {
+              setCurrentQuestion(prev => prev + 1);
+            } else {
+              calculateResults();
+            }
+          };
+
+          const handlePrevious = () => {
+            if (currentQuestion > 0) {
+              setCurrentQuestion(prev => prev - 1);
+            }
+          };
+
+          const handleEmailSubmit = () => {
+            if (email && email.includes('@') && name.trim()) {
+              setEmailCaptured(true);
+              setShowWelcome(false);
+            }
+          };
+
+          const isQuestionAnswered = () => {
+            const question = questions[currentQuestion];
+            const answer = answers[question.id];
+            
+            if (!answer) return false;
+            
+            if (question.type === 'multi-select') {
+              return answer.length > 0;
+            }
+            if (question.type === 'text') {
+              return question.validation ? question.validation(answer) : answer.length > 0;
+            }
+            return true;
+          };
+
+          const calculateResults = () => {
+            const interests = { social: 0, marketing: 0, cyber: 0, ads: 0 };
+            
+            if (answers[1]) {
+              answers[1].forEach(optionId => {
+                const option = questions[0].options.find(o => o.id === optionId);
+                if (option.tracks) {
+                  option.tracks.forEach(track => interests[track]++);
+                }
+              });
+            }
+            
+            if (answers[2]) {
+              const option = questions[1].options.find(o => o.id === answers[2]);
+              if (option.track && option.track !== 'explore') {
+                interests[option.track] += 2;
+              }
+            }
+            
+            const employmentStatus = answers[3] ? questions[2].options.find(o => o.id === answers[3]) : null;
+            const experience = answers[4] ? questions[3].options.find(o => o.id === answers[4])?.score || 0 : 0;
+            const motivation = answers[5] ? questions[4].options.find(o => o.id === answers[5]) : null;
+            const timeline = answers[6] ? questions[5].options.find(o => o.id === answers[6]) : null;
+            const objection = answers[7] ? questions[6].options.find(o => o.id === answers[7]) : null;
+            
+            let recommendedProgram = {
+              primary: { name: "AI Fundamentals", duration: "10 Weeks", cost: 250 },
+              secondary: null
+            };
+            
+            const topInterest = Object.entries(interests).sort((a, b) => b[1] - a[1])[0][0];
+            
+            if (topInterest === 'cyber' && experience > 0) {
+              recommendedProgram.secondary = { 
+                name: "Intro to Cybersecurity", 
+                duration: "20 Weeks", 
+                cost: 5500,
+                salary: [50000, 65000],
+                roles: ["Cybersecurity Analyst", "SOC Analyst", "Security Operations Specialist"]
+              };
+            } else if (topInterest === 'ads') {
+              recommendedProgram.secondary = { 
+                name: "Paid Ads Specialist (Meta Focus)", 
+                duration: "10 Weeks", 
+                cost: 495,
+                salary: [40000, 52000],
+                roles: ["Paid Ads Specialist", "PPC Specialist", "Media Buyer"]
+              };
+            } else if (topInterest === 'social') {
+              recommendedProgram.secondary = { 
+                name: "Organic Social Media Marketing", 
+                duration: "10 Weeks", 
+                cost: 495,
+                salary: [38000, 48000],
+                roles: ["Social Media Manager", "Content Creator", "Community Manager"]
+              };
+            } else if (topInterest === 'marketing' || interests.marketing > 2) {
+              recommendedProgram.secondary = { 
+                name: "Digital Marketing Immersion", 
+                duration: "20 Weeks", 
+                cost: 2950,
+                salary: [42000, 55000],
+                roles: ["Digital Marketing Coordinator", "Content Specialist", "SEO Specialist"]
+              };
+            } else {
+              recommendedProgram.secondary = { 
+                name: "Digital Marketing Immersion", 
+                duration: "20 Weeks", 
+                cost: 2950,
+                salary: [42000, 55000],
+                roles: ["Digital Marketing Coordinator", "Content Specialist", "Marketing Associate"]
+              };
+            }
+            
+            const results = {
+              ...recommendedProgram,
+              interests,
+              experience,
+              employmentStatus: employmentStatus?.segment || 'unknown',
+              motivation: motivation?.pain || 'unknown',
+              urgency: timeline?.urgency || 'unknown',
+              objection: objection?.objection || 'unknown',
+              targetSalary: answers[8] ? questions[7].options.find(o => o.id === answers[8])?.range : [45000, 55000],
+              phone: answers[9] || '',
+              attribution: answers[10] ? questions[9].options.find(o => o.id === answers[10])?.source : 'unknown'
+            };
+            
+            // Send to Salesforce Web-to-Lead
+            sendToSalesforce(results);
+            
+            setShowResults(results);
+          };
+
+          // Salesforce Web-to-Lead Integration
+          const sendToSalesforce = (results) => {
+            // ⚠️ IMPORTANT: Replace with YOUR Salesforce Organization ID
+            const SALESFORCE_OID = 'YOUR_SALESFORCE_ORG_ID_HERE'; // Get this from Web-to-Lead setup
+            
+            // Calculate lead score
+            const urgencyScore = {
+              'hot': 12,
+              'warm': 9,
+              'cool': 6,
+              'cold': 3
+            }[results.urgency] || 0;
+            
+            const motivationScore = {
+              'unemployment': 10,
+              'insecurity': 10,
+              'stagnation': 8,
+              'money': 6,
+              'passion': 4,
+              'exploration': 2
+            }[results.motivation] || 0;
+            
+            const phoneScore = results.phone ? 5 : 0;
+            const leadScore = urgencyScore + (motivationScore * 2) + phoneScore;
+            
+            // Create form data
+            const formData = new FormData();
+            
+            // Standard Salesforce fields
+            formData.append('oid', SALESFORCE_OID);
+            formData.append('retURL', window.location.href);
+            formData.append('first_name', name.split(' ')[0] || name);
+            formData.append('last_name', name.split(' ').slice(1).join(' ') || 'Unknown');
+            formData.append('email', email);
+            formData.append('phone', results.phone || '');
+            formData.append('company', 'Self');
+            formData.append('lead_source', 'Career Assessment');
+            
+            // Custom fields (use your actual API names from Salesforce)
+            formData.append('00N5e00000XXXXX', results.secondary?.name || 'Not assigned'); // Program_Interest__c
+            formData.append('00N5e00000XXXXX', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
+            formData.append('00N5e00000XXXXX', experienceLevelLabel(results.experience)); // Experience_Level__c
+            formData.append('00N5e00000XXXXX', motivationLabel(results.motivation)); // Motivation__c
+            formData.append('00N5e00000XXXXX', timelineLabel(results.urgency)); // Timeline__c
+            formData.append('00N5e00000XXXXX', objectionLabel(results.objection)); // Primary_Objection__c
+            formData.append('00N5e00000XXXXX', results.targetSalary[0]); // Target_Salary__c
+            formData.append('00N5e00000XXXXX', results.urgency); // Urgency_Score__c
+            formData.append('00N5e00000XXXXX', leadScore); // Lead_Score__c
+            formData.append('00N5e00000XXXXX', attributionLabel(results.attribution)); // Attribution_Source__c
+            
+            // Send to Salesforce
+            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
+              method: 'POST',
+              body: formData,
+              mode: 'no-cors'
+            }).then(() => {
+              console.log('Lead sent to Salesforce successfully');
+            }).catch((error) => {
+              console.error('Error sending to Salesforce:', error);
+            });
+          };
+          
+          // Helper functions to convert codes to readable labels
+          const employmentStatusLabel = (status) => {
+            const map = {
+              'employed': 'Employed Full-time',
+              'unemployed': 'Unemployed',
+              'student': 'Student',
+              'parent': 'Stay-at-home Parent'
+            };
+            return map[status] || 'Unknown';
+          };
+          
+          const experienceLevelLabel = (level) => {
+            const map = { 
+              0: 'New to Tech', 
+              1: 'Basic Tech Skills', 
+              2: 'Built Websites/Code', 
+              3: 'Built Apps/10+ Years' 
+            };
+            return map[level] || 'Unknown';
+          };
+          
+          const motivationLabel = (motivation) => {
+            const map = {
+              'unemployment': 'Unemployed',
+              'stagnation': 'Dead-end Job',
+              'money': 'Increase Income',
+              'passion': 'Passion for Field',
+              'insecurity': 'Job Instability',
+              'exploration': 'Exploring Options'
+            };
+            return map[motivation] || 'Unknown';
+          };
+          
+          const timelineLabel = (urgency) => {
+            const map = {
+              'hot': 'ASAP (1-3 months)',
+              'warm': 'Soon (3-6 months)',
+              'cool': 'This Year (6-12 months)',
+              'cold': 'Just Researching'
+            };
+            return map[urgency] || 'Unknown';
+          };
+          
+          const objectionLabel = (objection) => {
+            const map = {
+              'price': 'Cost/Affordability',
+              'time': 'Time Commitment',
+              'confidence': 'Confidence in Success',
+              'placement': 'Job Placement Concerns',
+              'confusion': 'Program Choice Confusion',
+              'decision-maker': 'Family Decision',
+              'none': 'No Concerns - Ready to Start'
+            };
+            return map[objection] || 'Unknown';
+          };
+          
+          const attributionLabel = (source) => {
+            const map = {
+              'organic': 'Google/Search',
+              'social': 'Social Media',
+              'referral': 'Referral',
+              'paid': 'Online Ad',
+              'video': 'YouTube'
+            };
+            return map[source] || 'Other';
+          };
+
+          const progress = ((currentQuestion + 1) / questions.length) * 100;
+          const currentQ = questions[currentQuestion];
+
+          if (showWelcome) {
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50 flex items-center justify-center p-4">
+                <div className="max-w-2xl w-full">
+                  <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-tntp-sky">
+                    <div className="text-center mb-8">
+                      {/* Full Banner Logo */}
+                      <div className="mb-6">
+                        <img 
+                          src="ntp-logo-banner.jpg" 
+                          alt="The New Trade Program - Apprentice Based Learning for jobs in Tech" 
+                          className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg"
+                        />
+                      </div>
+                      <h1 className="text-4xl font-bold text-tntp-navy mb-4">Welcome to The New Trade Program Career Path Finder</h1>
+                      <p className="text-xl text-gray-700 mb-2">Discover your perfect tech & marketing career in just 7 minutes</p>
+                      <p className="text-gray-600">Get personalized program recommendations, salary projections, and local job opportunities</p>
+                    </div>
+                    
+                    <div className="space-y-4 mb-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-tntp-navy mb-2">First Name *</label>
+                        <input
+                          type="text"
+                          value={name}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Auto-capitalize first letter
+                            const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
+                            setName(capitalized);
+                          }}
+                          placeholder="Enter your first name"
+                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-tntp-sky focus:outline-none text-lg focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-semibold text-tntp-navy mb-2">Email Address *</label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="your.email@example.com"
+                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-tntp-sky focus:outline-none text-lg focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-50 rounded-xl p-4 mb-6 border-2 border-tntp-gold">
+                      <p className="text-sm text-gray-700">
+                        <span className="font-bold text-tntp-navy">📧 Why we need your email:</span> We'll send you a detailed PDF of your personalized career plan, program recommendations, and exclusive enrollment discounts.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <button
+                        onClick={handleEmailSubmit}
+                        disabled={!email.includes('@') || !name.trim()}
+                        className="w-full bg-gradient-to-r from-tntp-gold to-tntp-sky text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        Start Your Assessment
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                    
+                    <p className="text-xs text-gray-500 text-center mt-4">
+                      🔒 Your information is secure. We never share your data. No spam, ever.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          if (showResults) {
+            return <ResultsPage results={showResults} email={email} name={name} />;
+          }
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
+              <div className="bg-white border-b-4 border-tntp-sky shadow-lg">
+                <div className="max-w-4xl mx-auto px-4 py-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <img 
+                        src="logo-icon.png" 
+                        alt="The New Trade Program Logo" 
+                        className="w-16 h-16 object-contain rounded-full"
+                      />
+                      <div>
+                        <h1 className="text-2xl font-bold text-tntp-navy">
+                          {name ? `${name}'s` : "The New Trade Program"} Quick Path Finder
+                        </h1>
+                        <p className="text-sm text-gray-600">Discover your perfect career pathway in 7 minutes</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-500">Question {currentQuestion + 1} of {questions.length}</div>
+                      <div className="text-2xl font-bold text-tntp-sky">{Math.round(progress)}%</div>
+                    </div>
+                  </div>
+                  
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-tntp-blue via-tntp-gold to-tntp-sky transition-all duration-500 ease-out"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="max-w-4xl mx-auto px-4 py-12">
+                <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-tntp-sky">
+                  <div className="inline-block bg-tntp-navy text-white px-6 py-3 rounded-full text-sm font-bold mb-6 shadow-lg border-2 border-tntp-sky">
+                    {currentQ.section}
+                  </div>
+                  
+                  <h2 className="text-3xl font-bold text-tntp-navy mb-3">
+                    {currentQ.question}
+                  </h2>
+                  
+                  {currentQ.subtitle && (
+                    <p className="text-gray-600 mb-8">{currentQ.subtitle}</p>
+                  )}
+
+                  <div className="space-y-4 mb-8">
+                    {currentQ.type === 'text' ? (
+                      <input
+                        type="text"
+                        value={answers[currentQ.id] || ''}
+                        onChange={(e) => handleAnswer(currentQ.id, e.target.value)}
+                        placeholder={currentQ.placeholder}
+                        className="w-full px-6 py-4 border-3 border-gray-300 rounded-2xl text-lg focus:border-tntp-sky focus:outline-none focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
+                      />
+                    ) : currentQ.type === 'multi-select' ? (
+                      currentQ.options.map((option) => {
+                        const isSelected = answers[currentQ.id]?.includes(option.id);
+                        const canSelect = !currentQ.maxSelections || !answers[currentQ.id] || answers[currentQ.id].length < currentQ.maxSelections || isSelected;
+                        
+                        return (
+                          <button
+                            key={option.id}
+                            onClick={() => {
+                              if (!canSelect && !isSelected) return;
+                              const current = answers[currentQ.id] || [];
+                              const newValue = isSelected
+                                ? current.filter(id => id !== option.id)
+                                : [...current, option.id];
+                              handleAnswer(currentQ.id, newValue);
+                            }}
+                            className={`w-full px-6 py-4 border-3 rounded-2xl text-left transition-all ${
+                              isSelected
+                                ? 'border-tntp-sky bg-blue-50 shadow-lg scale-105'
+                                : canSelect
+                                ? 'border-gray-300 hover:border-tntp-sky hover:bg-blue-50'
+                                : 'border-gray-200 opacity-50 cursor-not-allowed'
+                            }`}
+                            disabled={!canSelect && !isSelected}
+                          >
+                            <div className="flex items-start">
+                              {option.icon && (
+                                <span className="text-3xl mr-4">{option.icon}</span>
+                              )}
+                              <div className="flex-1">
+                                <div className="font-semibold text-gray-900 text-lg">{option.label}</div>
+                              </div>
+                              {isSelected && (
+                                <CheckCircle className="w-6 h-6 text-tntp-sky flex-shrink-0" />
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })
+                    ) : (
+                      currentQ.options.map((option) => {
+                        const isSelected = answers[currentQ.id] === option.id;
+                        
+                        return (
+                          <button
+                            key={option.id}
+                            onClick={() => handleAnswer(currentQ.id, option.id)}
+                            className={`w-full px-6 py-4 border-3 rounded-2xl text-left transition-all ${
+                              isSelected
+                                ? 'border-tntp-sky bg-blue-50 shadow-lg scale-105'
+                                : 'border-gray-300 hover:border-tntp-sky hover:bg-blue-50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-gray-900 text-lg">{option.label}</span>
+                              {isSelected && (
+                                <CheckCircle className="w-6 h-6 text-tntp-sky" />
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  <div className="flex gap-4">
+                    {currentQuestion > 0 && (
+                      <button
+                        onClick={handlePrevious}
+                        className="px-6 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+                      >
+                        Previous
+                      </button>
+                    )}
+                    
+                    {currentQ.id === 9 && (
+                      <button
+                        onClick={() => {
+                          handleAnswer(currentQ.id, '');
+                          handleNext();
+                        }}
+                        className="px-6 py-3 border-2 border-tntp-sky text-tntp-sky rounded-xl font-semibold hover:bg-blue-50 transition-all"
+                      >
+                        Skip
+                      </button>
+                    )}
+                    
+                    <button
+                      onClick={handleNext}
+                      disabled={!isQuestionAnswered()}
+                      className="flex-1 bg-gradient-to-r from-tntp-gold to-tntp-sky text-white py-3 rounded-xl font-semibold text-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {currentQuestion === questions.length - 1 ? 'See My Results' : 'Next'}
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const ResultsPage = ({ results, email, name }) => {
+          const totalInvestment = results.secondary?.cost || 0;
+          const aiFundamentalsValue = results.primary.cost;
+          const salaryIncrease = results.secondary ? 
+            (results.secondary.salary[0] + results.secondary.salary[1]) / 2 - 35000 : 
+            10000;
+          
+          const greeting = name ? `${name}, here's` : "Here's";
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
+              <div className="bg-gradient-to-r from-tntp-navy via-tntp-blue to-tntp-gold text-white">
+                <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+                  <div className="inline-flex items-center justify-center mb-6 bg-white rounded-2xl p-4 shadow-xl">
+                    <img 
+                      src="ntp-logo-banner.jpg" 
+                      alt="The New Trade Program - Apprentice Based Learning" 
+                      className="max-w-md w-full"
+                    />
+                  </div>
+                  <h1 className="text-5xl font-bold mb-4">{name ? `${name}, your` : "Your"} Perfect Path Found! 🎯</h1>
+                  <p className="text-2xl text-blue-100">{greeting} your personalized career roadmap</p>
+                </div>
+              </div>
+
+              <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+                {email && (
+                  <div className="bg-green-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                          <Mail className="w-6 h-6 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900 text-lg mb-1">📧 Results Sent!</h3>
+                        <p className="text-gray-700">
+                          We've sent a detailed copy of your personalized career plan to <span className="font-semibold">{email}</span>. 
+                          Check your inbox in the next few minutes!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-tntp-sky">
+                  <div className="text-center mb-8">
+                    <div className="inline-block bg-tntp-navy text-white px-6 py-3 rounded-full text-lg font-bold mb-4 shadow-lg border-2 border-tntp-sky">
+                      YOUR COMPLETE CAREER PATHWAY
+                    </div>
+                    <h2 className="text-3xl font-bold text-tntp-navy mb-2">{results.secondary?.name}</h2>
+                    <p className="text-gray-600 text-lg">Includes FREE AI Fundamentals Course ($250 value)</p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50 rounded-2xl p-8 mb-6 border-4 border-tntp-gold shadow-xl">
+                    <div className="text-center mb-6">
+                      <div className="inline-flex items-center justify-center gap-3 mb-4">
+                        <div className="text-5xl">🎓</div>
+                        <div className="text-5xl">+</div>
+                        <div className="text-5xl">🚀</div>
+                      </div>
+                      <h3 className="text-3xl font-bold text-tntp-navy mb-3">Complete Training Bundle</h3>
+                      <div className="flex items-center justify-center gap-6 flex-wrap mb-4">
+                        <div className="flex items-center gap-2 text-gray-700 text-lg">
+                          <Clock className="w-5 h-5" />
+                          <span className="font-bold">{parseInt(results.primary.duration) + parseInt(results.secondary?.duration || 0)} Weeks Total</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-700 text-lg">
+                          <span className="text-3xl">💰</span>
+                          <span className="font-bold text-3xl text-tntp-gold">${totalInvestment.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <div className="bg-green-100 rounded-xl p-4 border-2 border-green-400 inline-block mb-2 shadow-md">
+                        <p className="text-green-800 font-bold text-base">✨ AI Fundamentals Course Included FREE!</p>
+                      </div>
+                      <div className="text-base text-gray-700 font-semibold">
+                        <span className="line-through text-gray-500">${aiFundamentalsValue}</span> <span className="text-green-700 font-bold">FREE with enrollment</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="bg-white rounded-xl p-6 border-2 border-green-400 shadow-md">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            🎁
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h4 className="text-xl font-bold text-tntp-navy">BONUS: {results.primary.name}</h4>
+                              <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-md">FREE!</span>
+                            </div>
+                            <p className="text-gray-700 mb-3">
+                              Master AI literacy, professional communication, and digital productivity. Build the essential skills 
+                              every tech professional needs.
+                            </p>
+                            <div className="flex items-center gap-4 text-sm">
+                              <span className="text-gray-600">📅 {results.primary.duration}</span>
+                              <span className="text-green-700 font-bold text-base">💵 FREE ($250 value)</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-xl p-6 border-2 border-tntp-sky shadow-md">
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-tntp-gold to-tntp-sky rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            ⭐
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold text-tntp-navy mb-2">Specialization: {results.secondary?.name}</h4>
+                            <p className="text-gray-700 mb-3">
+                              Gain hands-on experience and industry-recognized certifications in your chosen field. 
+                              Build a professional portfolio that gets you hired.
+                            </p>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                              <span>📅 {results.secondary?.duration}</span>
+                              <span className="font-bold text-tntp-navy">💵 ${results.secondary?.cost.toLocaleString()}</span>
+                            </div>
+                            
+                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border-2 border-green-300">
+                              <div className="flex items-center gap-3 mb-2">
+                                <TrendingUp className="w-5 h-5 text-green-600" />
+                                <span className="font-bold text-gray-900">Career Outcome:</span>
+                              </div>
+                              <div className="text-2xl font-bold text-green-600 mb-1">
+                                ${results.secondary.salary[0].toLocaleString()} - ${results.secondary.salary[1].toLocaleString()}/year
+                              </div>
+                              <div className="text-sm text-gray-600">Projected starting salary range</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 bg-blue-50 rounded-xl p-5 border-2 border-tntp-sky">
+                      <h4 className="font-bold text-tntp-navy mb-3 text-lg">✨ Why This Bundle Is Unbeatable:</h4>
+                      <ul className="space-y-2 text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <span className="text-tntp-sky font-bold">✓</span>
+                          <span><strong>FREE AI Fundamentals course</strong> ($250 value) - Start with in-demand AI skills</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-tntp-sky font-bold">✓</span>
+                          <span>Complete career pathway from beginner to job-ready professional</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-tntp-sky font-bold">✓</span>
+                          <span>Industry certifications recognized by top employers nationwide</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-tntp-sky font-bold">✓</span>
+                          <span>Real portfolio projects you can show in interviews</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-tntp-sky font-bold">✓</span>
+                          <span>Job placement support and salary negotiation coaching</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-green-400">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Award className="w-8 h-8 text-green-600" />
+                    <h2 className="text-3xl font-bold text-tntp-navy">Your Complete Package Investment</h2>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6 mb-6">
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6">
+                      <div className="text-sm text-gray-600 mb-2">Your Total Investment</div>
+                      <div className="text-4xl font-bold text-gray-900 mb-1">${totalInvestment.toLocaleString()}</div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        {results.secondary?.name}
+                      </div>
+                      <div className="bg-green-200 rounded-lg p-3 mb-2 border-2 border-green-400">
+                        <p className="text-sm text-green-900 font-bold">
+                          + FREE {results.primary.name}
+                        </p>
+                        <p className="text-xs text-green-800 font-semibold">
+                          ($250 value included at no charge)
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-gray-300">
+                        <p className="text-xs text-gray-500">Everything you need from beginner to job-ready</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6">
+                      <div className="text-sm text-gray-700 mb-2">Expected Salary Increase (Year 1)</div>
+                      <div className="text-4xl font-bold text-green-600 mb-1">+${salaryIncrease.toLocaleString()}</div>
+                      <div className="text-sm text-gray-700">
+                        Return on Investment: ~{Math.ceil(totalInvestment / salaryIncrease * 12)} months
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-green-300">
+                        <p className="text-xs text-green-700 font-semibold">Your training pays for itself in less than a year!</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
+                    <div className="flex items-start gap-3">
+                      <Zap className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="font-bold text-gray-900 mb-2">Why This Is An Incredible Value:</h3>
+                        <ul className="space-y-2 text-gray-700">
+                          <li>✓ <strong>FREE AI Fundamentals course</strong> - Get $250 in training at no cost</li>
+                          <li>✓ Complete career transformation in one streamlined program</li>
+                          <li>✓ AI skills that set you apart from 90% of other candidates</li>
+                          <li>✓ Industry certifications recognized by top employers nationwide</li>
+                          <li>✓ Real portfolio projects you can show in interviews</li>
+                          <li>✓ Job placement support and salary negotiation coaching</li>
+                          <li>✓ Skills that compound - your earning potential grows year after year</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-tntp-gold via-tntp-coral to-tntp-blue rounded-3xl shadow-2xl p-8 text-white">
+                  <h2 className="text-3xl font-bold mb-4 text-center">🚀 Ready to Start Your Journey?</h2>
+                  <p className="text-xl text-white/90 mb-8 text-center">
+                    Enroll in your complete career pathway bundle today!
+                  </p>
+
+                  <div className="space-y-4 max-w-md mx-auto">
+                    <button className="w-full bg-white text-tntp-navy py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all flex items-center justify-center gap-2">
+                      Schedule Free Consultation
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                    
+                    <button className="w-full bg-tntp-navy text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all">
+                      Enroll in Complete Bundle Now
+                    </button>
+                    
+                    {email && (
+                      <button className="w-full bg-transparent border-2 border-white text-white py-3 rounded-xl font-semibold hover:bg-white hover:text-tntp-navy transition-all flex items-center justify-center gap-2">
+                        <Download className="w-5 h-5" />
+                        Download Your Career Plan PDF
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mt-8 text-center text-white/90">
+                    <p className="mb-2">Questions about the program? We're here to help!</p>
+                    <p className="font-semibold">📞 Call/Text: (555) 123-4567</p>
+                    <p className="font-semibold">✉️ Email: admissions@thenewtradeprogram.com</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TNTPAssessment />);
+    </script>
+</body>
+</html>
