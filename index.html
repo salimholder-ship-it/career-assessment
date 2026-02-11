@@ -131,6 +131,7 @@
           const [showResults, setShowResults] = useState(false);
           const [email, setEmail] = useState('');
           const [name, setName] = useState('');
+          const [lastName, setLastName] = useState('');
           const [emailCaptured, setEmailCaptured] = useState(false);
 
           // Question data structure
@@ -436,12 +437,30 @@
             // Standard Salesforce fields
             formData.append('oid', SALESFORCE_OID);
             formData.append('retURL', window.location.href);
-            formData.append('first_name', name.split(' ')[0] || name);
-            formData.append('last_name', name.split(' ').slice(1).join(' ') || 'Unknown');
+            formData.append('recordType', '012Po000008qpD7IAI'); // Student Record Type ID
+            
+            // Use the separate first and last name fields
+            formData.append('first_name', name.trim());
+            formData.append('last_name', lastName.trim());
             formData.append('email', email);
             formData.append('phone', results.phone || '');
-            formData.append('company', 'Self');
+            formData.append('company', 'Self - Career Seeker'); // Static company name - never changes
             formData.append('lead_source', 'Career Assessment');
+            
+            // Debug logging - see all data in browser console (F12)
+            console.log('=== SALESFORCE SUBMISSION DEBUG ===');
+            console.log('Organization ID:', SALESFORCE_OID);
+            console.log('Record Type ID:', '012Po000008qpD7IAI (Student)');
+            console.log('Company:', 'Self - Career Seeker');
+            console.log('First Name:', name.trim());
+            console.log('Last Name:', lastName.trim());
+            console.log('Email:', email);
+            console.log('Phone:', results.phone || '(not provided)');
+            console.log('Recommended Program:', results.primary.name);
+            console.log('Secondary Program:', results.secondary?.name);
+            console.log('Lead Score:', leadScore);
+            console.log('All form data:', Object.fromEntries(formData));
+            console.log('===================================');
             
             // Custom fields - YOUR ACTUAL SALESFORCE FIELD IDs
             formData.append('00NPo00000Hni9N', results.primary.name); // Recommended_Program__c (AI Fundamentals)
@@ -467,7 +486,7 @@
             formData.append('00NPo00000HnqbZ', attributionLabel(results.attribution)); // Attribution_Source__c
             
             // Send to Salesforce
-            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&debug=1&debugEmail=frank@thenewtradeprogram.com', {
+            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
               method: 'POST',
               body: formData,
               mode: 'no-cors'
@@ -586,6 +605,23 @@
                       </div>
                       
                       <div>
+                        <label className="block text-sm font-semibold text-tntp-navy mb-2">Last Name *</label>
+                        <input
+                          type="text"
+                          value={lastName}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Auto-capitalize first letter
+                            const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
+                            setLastName(capitalized);
+                          }}
+                          placeholder="Enter your last name"
+                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-tntp-sky focus:outline-none text-lg focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
                         <label className="block text-sm font-semibold text-tntp-navy mb-2">Email Address *</label>
                         <input
                           type="email"
@@ -607,7 +643,7 @@
                     <div className="space-y-3">
                       <button
                         onClick={handleEmailSubmit}
-                        disabled={!email.includes('@') || !name.trim()}
+                        disabled={!email.includes('@') || !name.trim() || !lastName.trim()}
                         className="w-full bg-gradient-to-r from-tntp-gold to-tntp-sky text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         Start Your Assessment
