@@ -437,7 +437,7 @@
             // Standard Salesforce fields
             formData.append('oid', SALESFORCE_OID);
             formData.append('retURL', window.location.href);
-            formData.append('recordType', '012Po000008qpD7IAI'); // Student Record Type ID
+            formData.append('recordType', '012Po000008qpD7'); // Student Record Type ID
             
             // Use the separate first and last name fields
             formData.append('first_name', name.trim());
@@ -450,7 +450,7 @@
             // Debug logging - see all data in browser console (F12)
             console.log('=== SALESFORCE SUBMISSION DEBUG ===');
             console.log('Organization ID:', SALESFORCE_OID);
-            console.log('Record Type ID:', '012Po000008qpD7IAI (Student)');
+            console.log('Record Type ID:', '012Po000008qpD7 (Student)');
             console.log('Company:', 'Self - Career Seeker');
             console.log('First Name:', name.trim());
             console.log('Last Name:', lastName.trim());
