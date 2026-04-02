@@ -292,7 +292,7 @@
           };
 
           const handleEmailSubmit = () => {
-            if (email && email.includes('@') && name.trim()) {
+            if (email && email.includes('@') && name.trim() && lastName.trim()) {
               setEmailCaptured(true);
               setShowWelcome(false);
             }
@@ -409,7 +409,7 @@
           // Salesforce Web-to-Lead Integration
           const sendToSalesforce = (results) => {
             // ⚠️ IMPORTANT: Replace with YOUR Salesforce Organization ID
-            const SALESFORCE_OID = '00DHs000003XeAG'; // Your actual Salesforce OID
+            const SALESFORCE_OID = '00DHs000003XeAG';
             
             // Calculate lead score
             const urgencyScore = {
@@ -437,90 +437,35 @@
             // Standard Salesforce fields
             formData.append('oid', SALESFORCE_OID);
             formData.append('retURL', window.location.href);
-            formData.append('recordType', '012Po000008qpD7'); // Student Record Type ID
-            
-            // Use the separate first and last name fields
-            formData.append('first_name', name.trim());
-            formData.append('last_name', lastName.trim());
+            formData.append('first_name', name);
+            formData.append('last_name', lastName);
             formData.append('email', email);
             formData.append('phone', results.phone || '');
-            formData.append('company', 'Self - Career Seeker'); // Static company name - never changes
+            formData.append('company', 'Self');
             formData.append('lead_source', 'Career Assessment');
             
-            // Debug logging - see all data in browser console (F12)
-            console.log('=== SALESFORCE SUBMISSION DEBUG ===');
-            console.log('Organization ID:', SALESFORCE_OID);
-            console.log('Record Type ID:', '012Po000008qpD7 (Student)');
-            console.log('Company:', 'Self - Career Seeker');
-            console.log('First Name:', name.trim());
-            console.log('Last Name:', lastName.trim());
-            console.log('Email:', email);
-            console.log('Phone:', results.phone || '(not provided)');
-            console.log('Recommended Program:', results.primary.name);
-            console.log('Secondary Program:', results.secondary?.name);
-            console.log('Lead Score:', leadScore);
-            console.log('All form data:', Object.fromEntries(formData));
-            console.log('===================================');
+            // Custom fields (use your actual API names from Salesforce)
+            formData.append('00N5e00000XXXXX', results.secondary?.name || 'Not assigned'); // Program_Interest__c
+            formData.append('00N5e00000XXXXX', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
+            formData.append('00N5e00000XXXXX', experienceLevelLabel(results.experience)); // Experience_Level__c
+            formData.append('00N5e00000XXXXX', motivationLabel(results.motivation)); // Motivation__c
+            formData.append('00N5e00000XXXXX', timelineLabel(results.urgency)); // Timeline__c
+            formData.append('00N5e00000XXXXX', objectionLabel(results.objection)); // Primary_Objection__c
+            formData.append('00N5e00000XXXXX', results.targetSalary[0]); // Target_Salary__c
+            formData.append('00N5e00000XXXXX', results.urgency); // Urgency_Score__c
+            formData.append('00N5e00000XXXXX', leadScore); // Lead_Score__c
+            formData.append('00N5e00000XXXXX', attributionLabel(results.attribution)); // Attribution_Source__c
             
-            // Custom fields - YOUR ACTUAL SALESFORCE FIELD IDs
-            formData.append('00NPo00000Hni9N', results.primary.name); // Recommended_Program__c (AI Fundamentals)
-            formData.append('00NPo00000HniVx', results.secondary?.name || 'Not assigned'); // Secondary_Program__c
-            
-            // Work Interests (comma-separated list)
-            const interestsList = Object.entries(results.interests || {})
-              .filter(([key, value]) => value > 0)
-              .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
-              .join(', ');
-            formData.append('00NPo00000Hnrfh', interestsList); // Work_Interests__c
-            
-            // Note: Work_Environment__c field exists in Salesforce but not collected in this assessment
-            // formData.append('00NPo00000HnjIL', 'Flexible - I\'m open to different setups'); // Default value
-            
-            formData.append('00NPo00000HnjlN', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
-            formData.append('00NPo00000HnkHd', experienceLevelLabel(results.experience)); // Experience_Level__c
-            formData.append('00NPo00000Hnksj', motivationLabel(results.motivation)); // Primary_Motivation__c
-            formData.append('00NPo00000HnlSD', timelineLabel(results.urgency)); // Timeline__c
-            formData.append('00NPo00000Hnltd', objectionLabel(results.objection)); // Primary_Objection__c
-            formData.append('00NPo00000HnnH8', `$${results.targetSalary[0].toLocaleString()} - $${results.targetSalary[1].toLocaleString()}`); // Target_Salary__c
-            formData.append('00NPo00000HneaQ', leadScore); // Lead_Score__c
-            formData.append('00NPo00000HnqbZ', attributionLabel(results.attribution)); // Attribution_Source__c
-            
-            // Send to Salesforce using traditional form submission via hidden iframe
-            // This avoids CORS issues and doesn't navigate away from the page
-            
-            // Create hidden iframe for submission
-            const iframe = document.createElement('iframe');
-            iframe.name = 'salesforce_iframe';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-            
-            // Create form
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
-            form.target = 'salesforce_iframe'; // Submit to iframe
-            form.style.display = 'none';
-            
-            // Add all FormData entries to the form
-            for (let [key, value] of formData.entries()) {
-              const input = document.createElement('input');
-              input.type = 'hidden';
-              input.name = key;
-              input.value = value;
-              form.appendChild(input);
-            }
-            
-            // Append form to document and submit
-            document.body.appendChild(form);
-            form.submit();
-            
-            // Clean up after submission
-            setTimeout(() => {
-              if (form.parentNode) document.body.removeChild(form);
-              if (iframe.parentNode) document.body.removeChild(iframe);
-            }, 3000);
-            
-            console.log('✅ Lead submitted to Salesforce via hidden iframe form POST');
+            // Send to Salesforce
+            fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
+              method: 'POST',
+              body: formData,
+              mode: 'no-cors'
+            }).then(() => {
+              console.log('Lead sent to Salesforce successfully');
+            }).catch((error) => {
+              console.error('Error sending to Salesforce:', error);
+            });
           };
           
           // Helper functions to convert codes to readable labels
@@ -629,7 +574,7 @@
                           required
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-semibold text-tntp-navy mb-2">Last Name *</label>
                         <input
@@ -637,7 +582,6 @@
                           value={lastName}
                           onChange={(e) => {
                             const value = e.target.value;
-                            // Auto-capitalize first letter
                             const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
                             setLastName(capitalized);
                           }}
@@ -687,7 +631,7 @@
           }
 
           if (showResults) {
-            return <ResultsPage results={showResults} email={email} name={name} />;
+            return <ResultsPage results={showResults} email={email} name={name} lastName={lastName} />;
           }
 
           return (
@@ -703,7 +647,7 @@
                       />
                       <div>
                         <h1 className="text-2xl font-bold text-tntp-navy">
-                          {name ? `${name}'s` : "The New Trade Program"} Quick Path Finder
+                          {name ? `${name} ${lastName}'s` : "The New Trade Program"} Quick Path Finder
                         </h1>
                         <p className="text-sm text-gray-600">Discover your perfect career pathway in 7 minutes</p>
                       </div>
@@ -716,7 +660,7 @@
                   
                   <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-tntp-blue via-tntp-gold to-tntp-sky transition-all duration-500 ease-out"
+                      className="h-full bg-gradient-to-r from-tntp-navy via-tntp-gold to-tntp-sky transition-all duration-500 ease-out"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -744,7 +688,7 @@
                         value={answers[currentQ.id] || ''}
                         onChange={(e) => handleAnswer(currentQ.id, e.target.value)}
                         placeholder={currentQ.placeholder}
-                        className="w-full px-6 py-4 border-3 border-gray-300 rounded-2xl text-lg focus:border-tntp-sky focus:outline-none focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
+                        className="w-full px-6 py-4 border-2 border-gray-300 rounded-2xl text-lg focus:border-tntp-sky focus:outline-none focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
                       />
                     ) : currentQ.type === 'multi-select' ? (
                       currentQ.options.map((option) => {
@@ -762,7 +706,7 @@
                                 : [...current, option.id];
                               handleAnswer(currentQ.id, newValue);
                             }}
-                            className={`w-full px-6 py-4 border-3 rounded-2xl text-left transition-all ${
+                            className={`w-full px-6 py-4 border-2 rounded-2xl text-left transition-all ${
                               isSelected
                                 ? 'border-tntp-sky bg-blue-50 shadow-lg scale-105'
                                 : canSelect
@@ -793,7 +737,7 @@
                           <button
                             key={option.id}
                             onClick={() => handleAnswer(currentQ.id, option.id)}
-                            className={`w-full px-6 py-4 border-3 rounded-2xl text-left transition-all ${
+                            className={`w-full px-6 py-4 border-2 rounded-2xl text-left transition-all ${
                               isSelected
                                 ? 'border-tntp-sky bg-blue-50 shadow-lg scale-105'
                                 : 'border-gray-300 hover:border-tntp-sky hover:bg-blue-50'
@@ -848,7 +792,7 @@
           );
         };
 
-        const ResultsPage = ({ results, email, name }) => {
+        const ResultsPage = ({ results, email, name, lastName }) => {
           const totalInvestment = results.secondary?.cost || 0;
           const aiFundamentalsValue = results.primary.cost;
           const salaryIncrease = results.secondary ? 
@@ -859,7 +803,7 @@
 
           return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
-              <div className="bg-gradient-to-r from-tntp-navy via-tntp-blue to-tntp-gold text-white">
+              <div className="bg-gradient-to-r from-tntp-navy via-tntp-sky to-tntp-gold text-white">
                 <div className="max-w-4xl mx-auto px-4 py-12 text-center">
                   <div className="inline-flex items-center justify-center mb-6 bg-white rounded-2xl p-4 shadow-xl">
                     <img 
@@ -883,10 +827,9 @@
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-lg mb-1">📧 Results Sent!</h3>
+                        <h3 className="font-bold text-gray-900 text-lg mb-1">✅ Assessment Complete!</h3>
                         <p className="text-gray-700">
-                          We've sent a detailed copy of your personalized career plan to <span className="font-semibold">{email}</span>. 
-                          Check your inbox in the next few minutes!
+                          Your personalized career plan is ready. An admissions advisor will follow up at <span className="font-semibold">{email}</span> within 1 business day.
                         </p>
                       </div>
                     </div>
@@ -1067,7 +1010,7 @@
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-tntp-gold via-tntp-coral to-tntp-blue rounded-3xl shadow-2xl p-8 text-white">
+                <div className="bg-gradient-to-r from-tntp-navy via-tntp-sky to-tntp-gold rounded-3xl shadow-2xl p-8 text-white">
                   <h2 className="text-3xl font-bold mb-4 text-center">🚀 Ready to Start Your Journey?</h2>
                   <p className="text-xl text-white/90 mb-8 text-center">
                     Enroll in your complete career pathway bundle today!
@@ -1093,7 +1036,7 @@
 
                   <div className="mt-8 text-center text-white/90">
                     <p className="mb-2">Questions about the program? We're here to help!</p>
-                    <p className="font-semibold">📞 Call/Text: (914) 266-0471‬ </p>
+                    <p className="font-semibold">📞 Call/Text: (914) 266-0471</p>
                     <p className="font-semibold">✉️ Email: admissions@thenewtradeprogram.com</p>
                   </div>
                 </div>
@@ -1105,6 +1048,17 @@
         // Render the app
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<TNTPAssessment />);
+    </script>
+    <script>
+      // Notify parent window of height changes (for iframe auto-resize)
+      function reportHeight() {
+        var height = document.body.scrollHeight;
+        window.parent.postMessage({ type: 'tntp-resize', height: height }, '*');
+      }
+      // Report on load and whenever DOM changes
+      window.addEventListener('load', reportHeight);
+      var observer = new MutationObserver(reportHeight);
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true });
     </script>
 </body>
 </html>
