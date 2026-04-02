@@ -42,6 +42,8 @@
             font-family: 'Gotham', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
         
+        html, body, #root { height: auto; }
+
         .font-heading {
             font-family: 'Libre Baskerville', Georgia, serif;
             font-weight: 700;
@@ -134,16 +136,13 @@
           const [lastName, setLastName] = useState('');
           const [emailCaptured, setEmailCaptured] = useState(false);
 
-          // Report height to parent iframe ONLY when screens actually change.
-          // Tied to state — cannot loop because state only changes on user action.
+          // Reports height to parent only on real screen transitions — cannot loop.
           useEffect(() => {
-            var timer = setTimeout(function() {
+            var t = setTimeout(function() {
               var el = document.getElementById('root');
-              if (el) {
-                window.parent.postMessage({ type: 'tntp-resize', height: el.offsetHeight }, '*');
-              }
+              if (el) window.parent.postMessage({ type: 'tntp-resize', height: el.offsetHeight }, '*');
             }, 150);
-            return function() { clearTimeout(timer); };
+            return function() { clearTimeout(t); };
           }, [showWelcome, currentQuestion, showResults]);
 
           // Question data structure
@@ -456,17 +455,17 @@
             formData.append('company', 'Self');
             formData.append('lead_source', 'Career Assessment');
             
-            // Custom fields (use your actual API names from Salesforce)
-            formData.append('00N5e00000XXXXX', results.secondary?.name || 'Not assigned'); // Program_Interest__c
-            formData.append('00N5e00000XXXXX', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
-            formData.append('00N5e00000XXXXX', experienceLevelLabel(results.experience)); // Experience_Level__c
-            formData.append('00N5e00000XXXXX', motivationLabel(results.motivation)); // Motivation__c
-            formData.append('00N5e00000XXXXX', timelineLabel(results.urgency)); // Timeline__c
-            formData.append('00N5e00000XXXXX', objectionLabel(results.objection)); // Primary_Objection__c
-            formData.append('00N5e00000XXXXX', results.targetSalary[0]); // Target_Salary__c
-            formData.append('00N5e00000XXXXX', results.urgency); // Urgency_Score__c
-            formData.append('00N5e00000XXXXX', leadScore); // Lead_Score__c
-            formData.append('00N5e00000XXXXX', attributionLabel(results.attribution)); // Attribution_Source__c
+            formData.append('description',
+              'Program: ' + (results.secondary?.name || 'Not assigned') + ' | ' +
+              'Employment: ' + employmentStatusLabel(results.employmentStatus) + ' | ' +
+              'Experience: ' + experienceLevelLabel(results.experience) + ' | ' +
+              'Motivation: ' + motivationLabel(results.motivation) + ' | ' +
+              'Timeline: ' + timelineLabel(results.urgency) + ' | ' +
+              'Objection: ' + objectionLabel(results.objection) + ' | ' +
+              'Target Salary: $' + results.targetSalary[0].toLocaleString() + ' | ' +
+              'Lead Score: ' + leadScore + ' | ' +
+              'Source: ' + attributionLabel(results.attribution)
+            );
             
             // Send to Salesforce
             fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
@@ -552,7 +551,7 @@
 
           if (showWelcome) {
             return (
-              <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50 flex items-center justify-center p-4">
+              <div className="w-full bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50 flex items-center justify-center p-4 py-8">
                 <div className="max-w-2xl w-full">
                   <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-tntp-sky">
                     <div className="text-center mb-8">
@@ -647,7 +646,7 @@
           }
 
           return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
+            <div className="w-full bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
               <div className="bg-white border-b-4 border-tntp-sky shadow-lg">
                 <div className="max-w-4xl mx-auto px-4 py-6">
                   <div className="flex items-center justify-between mb-4">
@@ -814,7 +813,7 @@
           const greeting = name ? `${name}, here's` : "Here's";
 
           return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
+            <div className="w-full bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
               <div className="bg-gradient-to-r from-tntp-navy via-tntp-sky to-tntp-gold text-white">
                 <div className="max-w-4xl mx-auto px-4 py-12 text-center">
                   <div className="inline-flex items-center justify-center mb-6 bg-white rounded-2xl p-4 shadow-xl">
@@ -839,9 +838,10 @@
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-lg mb-1">✅ Assessment Complete!</h3>
+                        <h3 className="font-bold text-gray-900 text-lg mb-1">📧 Results Sent!</h3>
                         <p className="text-gray-700">
-                          Your personalized career plan is ready. An admissions advisor will follow up at <span className="font-semibold">{email}</span> within 1 business day.
+                          We've sent a detailed copy of your personalized career plan to <span className="font-semibold">{email}</span>. 
+                          Check your inbox in the next few minutes!
                         </p>
                       </div>
                     </div>
@@ -1048,7 +1048,7 @@
 
                   <div className="mt-8 text-center text-white/90">
                     <p className="mb-2">Questions about the program? We're here to help!</p>
-                    <p className="font-semibold">📞 Call/Text: (555) 123-4567</p>
+                    <p className="font-semibold">📞 Call/Text: (914) 266-0471</p>
                     <p className="font-semibold">✉️ Email: admissions@thenewtradeprogram.com</p>
                   </div>
                 </div>
@@ -1062,11 +1062,12 @@
         root.render(<TNTPAssessment />);
     </script>
     <script>
+      // One-time height report on initial load
       window.addEventListener('load', function() {
         setTimeout(function() {
           var el = document.getElementById('root');
           if (el) window.parent.postMessage({ type: 'tntp-resize', height: el.offsetHeight }, '*');
-        }, 500);
+        }, 600);
       });
     </script>
 </body>
