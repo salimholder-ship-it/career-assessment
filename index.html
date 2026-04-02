@@ -40,6 +40,15 @@
             margin: 0;
             padding: 0;
             font-family: 'Gotham', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            height: auto;
+        }
+
+        html {
+            height: auto;
+        }
+
+        #root {
+            height: auto;
         }
         
         .font-heading {
@@ -444,17 +453,18 @@
             formData.append('company', 'Self');
             formData.append('lead_source', 'Career Assessment');
             
-            // Custom fields (use your actual API names from Salesforce)
-            formData.append('00N5e00000XXXXX', results.secondary?.name || 'Not assigned'); // Program_Interest__c
-            formData.append('00N5e00000XXXXX', employmentStatusLabel(results.employmentStatus)); // Employment_Status__c
-            formData.append('00N5e00000XXXXX', experienceLevelLabel(results.experience)); // Experience_Level__c
-            formData.append('00N5e00000XXXXX', motivationLabel(results.motivation)); // Motivation__c
-            formData.append('00N5e00000XXXXX', timelineLabel(results.urgency)); // Timeline__c
-            formData.append('00N5e00000XXXXX', objectionLabel(results.objection)); // Primary_Objection__c
-            formData.append('00N5e00000XXXXX', results.targetSalary[0]); // Target_Salary__c
-            formData.append('00N5e00000XXXXX', results.urgency); // Urgency_Score__c
-            formData.append('00N5e00000XXXXX', leadScore); // Lead_Score__c
-            formData.append('00N5e00000XXXXX', attributionLabel(results.attribution)); // Attribution_Source__c
+            // All assessment data packed into Salesforce description field
+            formData.append('description',
+              'Program Interest: ' + (results.secondary?.name || 'Not assigned') + ' | ' +
+              'Employment: ' + employmentStatusLabel(results.employmentStatus) + ' | ' +
+              'Experience: ' + experienceLevelLabel(results.experience) + ' | ' +
+              'Motivation: ' + motivationLabel(results.motivation) + ' | ' +
+              'Timeline: ' + timelineLabel(results.urgency) + ' | ' +
+              'Objection: ' + objectionLabel(results.objection) + ' | ' +
+              'Target Salary: $' + results.targetSalary[0].toLocaleString() + ' | ' +
+              'Lead Score: ' + leadScore + ' | ' +
+              'Source: ' + attributionLabel(results.attribution)
+            );
             
             // Send to Salesforce
             fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
@@ -540,7 +550,7 @@
 
           if (showWelcome) {
             return (
-              <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50 flex items-center justify-center p-4">
+              <div className="w-full bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50 flex items-center justify-center p-4 py-8">
                 <div className="max-w-2xl w-full">
                   <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-tntp-sky">
                     <div className="text-center mb-8">
@@ -635,7 +645,7 @@
           }
 
           return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
+            <div className="w-full bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
               <div className="bg-white border-b-4 border-tntp-sky shadow-lg">
                 <div className="max-w-4xl mx-auto px-4 py-6">
                   <div className="flex items-center justify-between mb-4">
@@ -660,7 +670,7 @@
                   
                   <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-tntp-navy via-tntp-gold to-tntp-sky transition-all duration-500 ease-out"
+                      className="h-full bg-gradient-to-r from-tntp-blue via-tntp-gold to-tntp-sky transition-all duration-500 ease-out"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -688,7 +698,7 @@
                         value={answers[currentQ.id] || ''}
                         onChange={(e) => handleAnswer(currentQ.id, e.target.value)}
                         placeholder={currentQ.placeholder}
-                        className="w-full px-6 py-4 border-2 border-gray-300 rounded-2xl text-lg focus:border-tntp-sky focus:outline-none focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
+                        className="w-full px-6 py-4 border-3 border-gray-300 rounded-2xl text-lg focus:border-tntp-sky focus:outline-none focus:ring-2 focus:ring-tntp-sky focus:ring-opacity-30"
                       />
                     ) : currentQ.type === 'multi-select' ? (
                       currentQ.options.map((option) => {
@@ -706,7 +716,7 @@
                                 : [...current, option.id];
                               handleAnswer(currentQ.id, newValue);
                             }}
-                            className={`w-full px-6 py-4 border-2 rounded-2xl text-left transition-all ${
+                            className={`w-full px-6 py-4 border-3 rounded-2xl text-left transition-all ${
                               isSelected
                                 ? 'border-tntp-sky bg-blue-50 shadow-lg scale-105'
                                 : canSelect
@@ -737,7 +747,7 @@
                           <button
                             key={option.id}
                             onClick={() => handleAnswer(currentQ.id, option.id)}
-                            className={`w-full px-6 py-4 border-2 rounded-2xl text-left transition-all ${
+                            className={`w-full px-6 py-4 border-3 rounded-2xl text-left transition-all ${
                               isSelected
                                 ? 'border-tntp-sky bg-blue-50 shadow-lg scale-105'
                                 : 'border-gray-300 hover:border-tntp-sky hover:bg-blue-50'
@@ -802,8 +812,8 @@
           const greeting = name ? `${name}, here's` : "Here's";
 
           return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
-              <div className="bg-gradient-to-r from-tntp-navy via-tntp-sky to-tntp-gold text-white">
+            <div className="w-full bg-gradient-to-br from-blue-50 via-orange-50 to-amber-50">
+              <div className="bg-gradient-to-r from-tntp-navy via-tntp-blue to-tntp-gold text-white">
                 <div className="max-w-4xl mx-auto px-4 py-12 text-center">
                   <div className="inline-flex items-center justify-center mb-6 bg-white rounded-2xl p-4 shadow-xl">
                     <img 
@@ -827,9 +837,10 @@
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-lg mb-1">✅ Assessment Complete!</h3>
+                        <h3 className="font-bold text-gray-900 text-lg mb-1">📧 Results Sent!</h3>
                         <p className="text-gray-700">
-                          Your personalized career plan is ready. An admissions advisor will follow up at <span className="font-semibold">{email}</span> within 1 business day.
+                          We've sent a detailed copy of your personalized career plan to <span className="font-semibold">{email}</span>. 
+                          Check your inbox in the next few minutes!
                         </p>
                       </div>
                     </div>
@@ -1010,7 +1021,7 @@
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-tntp-navy via-tntp-sky to-tntp-gold rounded-3xl shadow-2xl p-8 text-white">
+                <div className="bg-gradient-to-r from-tntp-gold via-tntp-coral to-tntp-blue rounded-3xl shadow-2xl p-8 text-white">
                   <h2 className="text-3xl font-bold mb-4 text-center">🚀 Ready to Start Your Journey?</h2>
                   <p className="text-xl text-white/90 mb-8 text-center">
                     Enroll in your complete career pathway bundle today!
@@ -1050,8 +1061,8 @@
         root.render(<TNTPAssessment />);
     </script>
     <script>
-      // Resize iframe to fit content — observes #root (React container) only,
-      // so iframe size changes never feed back into the measurement.
+      // Observes #root height only — never measures viewport-relative values,
+      // so iframe resizing cannot feed back into the measurement.
       function sendHeight(height) {
         if (height > 0) {
           window.parent.postMessage({ type: 'tntp-resize', height: height }, '*');
@@ -1068,7 +1079,6 @@
           }).observe(root);
         }
 
-        // Fire once immediately after React has rendered
         setTimeout(function() { sendHeight(root.offsetHeight); }, 300);
         setTimeout(function() { sendHeight(root.offsetHeight); }, 1000);
       }
