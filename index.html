@@ -1050,15 +1050,26 @@
         root.render(<TNTPAssessment />);
     </script>
     <script>
-      // Notify parent window of height changes (for iframe auto-resize)
+      // Auto-resize: reports content height to parent iframe on every size change
       function reportHeight() {
-        var height = document.body.scrollHeight;
+        var height = document.documentElement.scrollHeight;
         window.parent.postMessage({ type: 'tntp-resize', height: height }, '*');
       }
-      // Report on load and whenever DOM changes
+
+      // ResizeObserver is the most reliable way to catch React re-renders
+      if (window.ResizeObserver) {
+        var ro = new ResizeObserver(reportHeight);
+        ro.observe(document.body);
+      } else {
+        // Fallback for older browsers
+        var mo = new MutationObserver(reportHeight);
+        mo.observe(document.body, { childList: true, subtree: true });
+      }
+
+      // Also fire on load and after short delays to catch any late renders
       window.addEventListener('load', reportHeight);
-      var observer = new MutationObserver(reportHeight);
-      observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+      setTimeout(reportHeight, 300);
+      setTimeout(reportHeight, 1000);
     </script>
 </body>
 </html>
